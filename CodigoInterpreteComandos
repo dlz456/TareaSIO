@@ -25,8 +25,17 @@ int leer_comandos(char **tokens){
           	}
        	}
       	 
-       	
-   	 // Mensaje de error ante comando no valido
+       	if (redireccion >= 0 && tokens[i + 1] != NULL) { // bloque para leer el comando o archivo a ejecutar
+        	FILE *archivo_seleccionado = fopen(tokens[i + 1], "w"); //variable para seleccionar el archivo
+        	if (archivo_seleccionado  == NULL) {
+            	perror("No se puede abrir el archivo seleccionado");
+            	exit(EXIT_FAILURE);
+        	}
+        	dup2(fileno(archivo_seleccionado), STDOUT_FILENO); // directiva para duplicar la el parametro pasado despues de > para poder utilizarlo en el comando respectivo
+        	fclose(archivo_seleccionado);
+        	tokens[i] = NULL; // Eliminar el símbolo de redirección
+    	}
+   	 
     	if (execvp(tokens[0], tokens) == -1) {
         	perror("Ese comando no es valido");
         	exit(EXIT_FAILURE);
@@ -79,14 +88,3 @@ int main() {
 
 	return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
